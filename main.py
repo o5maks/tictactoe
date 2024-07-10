@@ -1,7 +1,8 @@
-from tkinter import Tk, Button, Label
+from tkinter import Tk, Button, Label, Canvas
 import tkinter.messagebox as msgbox
+import random
 
-def onClick(row, column):
+def on_click(row: int, column: int):
     button = buttons[row][column]
     if button.cget("text") and button.cget("text") != "":
         return
@@ -12,32 +13,46 @@ def onClick(row, column):
     current_lines_length += 1
 
     button.config(text=symbols[player])
-    winner = getWinner()
+    winner = get_winner()
 
-    if winner:
-        msg = f"{winner} win the TicTacToe"
-        msgbox.showinfo(message=msg)
+    # title = None
+    if winner is not None:
+        title = "Win!"
+        msg = f"{players[winner]} win the TicTacToe"
+        scores[winner] += 1
     elif current_lines_length >= 9:
+        title = "Tee!"
         msg = f"No winners for this game, replay?"
-        msgbox.showinfo(message=msg)
+        scores[-1] += 1 # Tee
     else:
         return
     
+    display_scores()
+    if msg is not None:
+        msgbox.showinfo(title=title, message=msg)
+
+    reset()
+
+def reset(ask: bool = False):
+    if ask:
+        if msgbox.askyesno(title='Restart the game', message='Ok?') is False or None:
+            return
+
+    global current_lines_length
     current_lines_length = 0
-    for rows in buttons:
-        for column in rows:
+    for row in buttons:
+        for column in row:
             column.config(text="")
 
-def getWinner():
-    lines = getLines()
+def get_winner():
+    lines = get_lines()
 
     for line in lines:
         if line[0] == line[1] == line[2] and line[0] != "":
-            return line[0]
-
+            return symbols.index(line[0])
     return None
 
-def getLines():
+def get_lines():
     lines = [
         [buttons[row][column].cget("text") for column in range(3)] for row in range(3)
     ] + [
@@ -49,6 +64,19 @@ def getLines():
 
     return lines
 
+def display_scores():
+    global scores_label
+    msg = f"""
+X: {scores[0]}
+O: {scores[1]}
+Tee's: {scores[-1]}
+"""
+    if scores_label is None:
+        scores_label = Label(window, text=msg)
+        scores_label.grid(row=3, column=0, columnspan=3)
+    else:
+        scores_label.config(text=msg)
+
 window = Tk()
 window.title("TicTacToe")
 window.minsize(500, 500)
@@ -56,20 +84,22 @@ window.minsize(500, 500)
 # Constants
 __font__ = "black"
 __back__ = "white"
-symbols = ["\u274C", "\u2B55"] 
+symbols = ["X", "O"] #["\u274C", "\u2B55"] 
 players = ["X", "O"]
 
 # Variables and storage
-player = 0
+player = random.randint(0, 1)
 buttons = [[], [], []]
+scores = [0, 0, 0] #X win's count, O win's count, tee's cout
 current_lines_length = 0
+scores_label = None
 
 # Buttons (for the rows and columns)
 for i in range(9):
     row, col = divmod(i, 3)
     button = Button(
         window,
-        command=lambda r=row, c=col: onClick(r, c),
+        command=lambda r=row, c=col: on_click(r, c),
         font=("Arial", 40),
         bg=__back__,
         fg=__font__,
@@ -78,5 +108,8 @@ for i in range(9):
     )
     button.grid(row=row, column=col)
     buttons[row].append(button)
+
+display_scores()
+Button(window, text="Restart", command=lambda: reset(True), font=("Arial", 20)).grid(row=4, column=2)
 
 window.mainloop()
