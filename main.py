@@ -1,4 +1,4 @@
-from tkinter import Tk, Button, Label, Canvas
+from tkinter import Tk, Button, Label
 import tkinter.messagebox as msgbox
 import random
 
@@ -34,12 +34,17 @@ def on_click(row: int, column: int):
     reset()
 
 def reset(ask: bool = False):
+    global current_lines_length
+    global player
+    if current_lines_length == 0:
+        return
+    
     if ask:
         if msgbox.askyesno(title='Restart the game', message='Ok?') is False or None:
             return
 
-    global current_lines_length
     current_lines_length = 0
+    player = random.randint(0, 1)
     for row in buttons:
         for column in row:
             column.config(text="")
@@ -72,7 +77,7 @@ O: {scores[1]}
 Tee's: {scores[-1]}
 """
     if scores_label is None:
-        scores_label = Label(window, text=msg)
+        scores_label = Label(window, text=msg, font=("Arial", 50))
         scores_label.grid(row=3, column=0, columnspan=3)
     else:
         scores_label.config(text=msg)
@@ -110,6 +115,6 @@ for i in range(9):
     buttons[row].append(button)
 
 display_scores()
-Button(window, text="Restart", command=lambda: reset(True), font=("Arial", 20)).grid(row=4, column=2)
+Button(window, text="Restart", command=lambda: reset(ask=True), font=("Arial", 20)).grid(row=4, column=2)
 
 window.mainloop()
