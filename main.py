@@ -7,8 +7,8 @@ def on_click(row: int, column: int):
     if button.cget("text") and button.cget("text") != "":
         return
     
-    global player
-    global current_lines_length
+    global player, current_lines_length
+    
     player = int(not player)
     current_lines_length += 1
 
@@ -21,9 +21,9 @@ def on_click(row: int, column: int):
         msg = f"{players[winner]} win the TicTacToe"
         scores[winner] += 1
     elif current_lines_length >= 9:
-        title = "Tee!"
+        title = "Tie!"
         msg = f"No winners for this game, replay?"
-        scores[-1] += 1 # Tee
+        scores[-1] += 1 # Tie
     else:
         return
     
@@ -34,26 +34,25 @@ def on_click(row: int, column: int):
     reset()
 
 def reset(ask: bool = False):
-    global current_lines_length
-    global player
+    global current_lines_length, player
     if current_lines_length == 0:
         return
     
-    if ask:
-        if msgbox.askyesno(title='Restart the game', message='Ok?') is False or None:
-            return
+    if ask and not msgbox.askyesno(title='Restart the game', message='Ok?'):
+        return
 
     current_lines_length = 0
     player = random.randint(0, 1)
-    for row in buttons:
-        for column in row:
-            column.config(text="")
+    
+    for row in rows:
+        for button in row:
+            button.config(text="")
 
 def get_winner():
     lines = get_lines()
 
     for line in lines:
-        if line[0] == line[1] == line[2] and line[0] != "":
+        if line[0] == line[1] == line[2] and line[0]:
             return symbols.index(line[0])
     return None
 
@@ -74,7 +73,7 @@ def display_scores():
     msg = f"""
 X: {scores[0]}
 O: {scores[1]}
-Tee's: {scores[-1]}
+Tie's: {scores[-1]}
 """
     if scores_label is None:
         scores_label = Label(window, text=msg, font=("Arial", 50))
@@ -95,7 +94,7 @@ players = ["X", "O"]
 # Variables and storage
 player = random.randint(0, 1)
 buttons = [[], [], []]
-scores = [0, 0, 0] #X win's count, O win's count, tee's cout
+scores = [0, 0, 0] #X win's count, O win's count, tie's cout
 current_lines_length = 0
 scores_label = None
 
