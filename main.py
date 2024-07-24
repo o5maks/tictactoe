@@ -4,7 +4,7 @@ import random
 
 def on_click(row: int, column: int):
     button = buttons[row][column]
-    if button.cget("text") and button.cget("text") != "":
+    if button.cget("text"):
         return
     
     global player, current_lines_length
