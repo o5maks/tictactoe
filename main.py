@@ -15,7 +15,6 @@ def on_click(row: int, column: int):
     button.config(text=symbols[player])
     winner = get_winner()
 
-    # title = None
     if winner is not None:
         title = "Win!"
         msg = f"{players[winner]} win the TicTacToe"
@@ -28,13 +27,12 @@ def on_click(row: int, column: int):
         return
     
     display_scores()
-    if msg is not None:
-        msgbox.showinfo(title=title, message=msg)
-
+    msgbox.showinfo(title=title, message=msg)
     reset()
 
 def reset(ask: bool = False):
     global current_lines_length, player
+
     if current_lines_length == 0:
         return
     
@@ -44,8 +42,8 @@ def reset(ask: bool = False):
     current_lines_length = 0
     player = random.randint(0, 1)
     
-    for row in rows:
-        for button in row:
+    for rows in buttons:
+        for button in rows:
             button.config(text="")
 
 def get_winner():
@@ -94,7 +92,7 @@ players = ["X", "O"]
 # Variables and storage
 player = random.randint(0, 1)
 buttons = [[], [], []]
-scores = [0, 0, 0] #X win's count, O win's count, tie's cout
+scores = [0, 0, 0] #X win's count, O win's count, tie's count
 current_lines_length = 0
 scores_label = None
 
